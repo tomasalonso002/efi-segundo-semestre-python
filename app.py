@@ -106,6 +106,11 @@ app.add_url_rule(
 )
 
 app.add_url_rule(
+    '/users/<id>',
+    view_func=MyUserApi.as_view('my_users_api'),
+    methods=['GET']
+)
+app.add_url_rule(
     '/users/<id>/role',
     view_func=EditUserAPI.as_view('edit_user_api'),
     methods=['PATCH']

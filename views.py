@@ -351,7 +351,26 @@ class UsersAPI(MethodView):
             return jsonify({"message":"No se encontraron usuarios"}),404
         return UserSchema(many=True).dump(usuarios)
     
-    
+class MyUserApi(MethodView):
+    @jwt_required()
+    @role_required('user','admin')
+    def get(self,id):
+        usuario = User.query.get(id)
+
+        if not usuario:
+            return jsonify({'message':'Usuario no encntrado'}),404
+        if usuario.is_active == False:
+            return jsonify({'message':'Usuario no encontrado'}),404
+        
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+        user_id = user.id
+        user_role = user.credentials.role
+        
+        if user_role == 'admin':
+            return jsonify({'message':'sos el admin'})
+        if int(user_id) == int(id):
+            return jsonify({'message':'sos el dueño del usuario'})
 #PATCH
 class EditUserAPI(MethodView):
     @jwt_required()
