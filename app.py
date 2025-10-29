@@ -7,11 +7,16 @@ from models import(
     Comment
 )
 
+#Lo use para que me pueda funcionar el frond
+from flask_cors import CORS
+
 from schemas import CategorySchema, UserSchema, UserCredentialsSchema, PostSchema, CommentSchema, RegisterSchema, LoginSchema
 
 from views import *
 
 app = Flask(__name__)
+
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI']=(
     'mysql+pymysql://root:@localhost/efi-segundo-semestre'
 )
