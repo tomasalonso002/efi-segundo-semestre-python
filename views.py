@@ -368,9 +368,20 @@ class MyUserApi(MethodView):
         user_role = user.credentials.role
         
         if user_role == 'admin':
-            return jsonify({'message':'sos el admin'})
+            return {
+                'id':user.id,
+                'name': user.name,
+                'email': user.email
+                    },200
         if int(user_id) == int(id):
-            return jsonify({'message':'sos el dueño del usuario'})
+            return {
+                'id':user.id,
+                'name': user.name,
+                'email': user.email
+                    },200
+        
+        return jsonify({'No estas autorizado a consultar un perfil no propio'}),404
+
 #PATCH
 class EditUserAPI(MethodView):
     @jwt_required()

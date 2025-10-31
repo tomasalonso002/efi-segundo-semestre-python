@@ -133,5 +133,7 @@ app.add_url_rule(
     view_func=StatsAPI.as_view('stats_api'),
     methods=['GET']
 )
+
+
 if __name__ == '__main__':
     app.run(debug=True)
