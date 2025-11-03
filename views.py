@@ -50,12 +50,12 @@ def ownership_requered(model, resource_kw="id", owner_field="id"):
             if hasattr(resource, "is_active") and not resource.is_active:
                 return {"message": "Usuario no encontrado"}, 404
             
-            #Permitir si ek rol es admin
+            #Permitir si el rol es admin
             if role == 'admin':
                 return fn(*args, **kwargs)
             #verificacion de propiedadd
             owner_id = getattr(resource, owner_field, None)
-            if int(current_user_id) != int(getattr(resource, owner_field)):
+            if int(current_user_id) != int(getattr(owner_id)):
                 return{"message":"No estas autorizado"}
             
             return fn(*args, **kwargs)
@@ -178,7 +178,7 @@ class NewPostsAPI(MethodView):
         },200
 
 
-#DELETE/PUTCH
+#DELETE/PATCH
 class DeletePostAPI(MethodView):
     @jwt_required()
     @role_required('user','moderador','admin')
@@ -194,12 +194,10 @@ class DeletePostAPI(MethodView):
         current_user_id = get_jwt_identity()
         user = User.query.get(current_user_id)
         user_role = user.credentials.role
-        print(user_role)
         
         if  user_role in ['admin','moderador']:
             posteo.is_active = False
             db.session.commit()
-            print("soy admin o mod")
             return jsonify({"message":"Post borrado"}),200
         if int(posteo.user_id) != int(current_user_id):
             return jsonify({"Error":"No estas autorizado a borrar este post"}),403
@@ -207,6 +205,7 @@ class DeletePostAPI(MethodView):
         db.session.commit()
         return jsonify({"message":"Post borrado"}),200
 
+#PUT
 class EditPostAPI(MethodView):
    @jwt_required()
    @role_required('user','moderador', 'admin')
@@ -283,7 +282,7 @@ class NewCommentOnePostAPI(MethodView):
             "message":"Comentario creado correctamente"
         })
 
-#DELETE/PUTCH
+#DELETE/PATCH
 class DeletePostCommentAPI(MethodView):
     @jwt_required()
     @role_required('user','moderador','admin')
@@ -293,7 +292,7 @@ class DeletePostCommentAPI(MethodView):
             return jsonify({"message": "Comentario no encontrado"}),404
         if comentario.is_active == False:
             return jsonify({"message": "Comentario no encontrado"}),404
-        #extract the user_role and user_id of token
+        #extrae el usuario del rol
         current_user_id = get_jwt_identity()
         user = User.query.get(current_user_id)
         user_role = user.credentials.role
@@ -333,8 +332,8 @@ class CetegoryAPI(MethodView):
         db.session.add(newCategory)
         db.session.commit()
         return jsonify({"message":"Categoria creada con exito"}),201
-#PUT and DELETE/PATCH
 
+#PUT and DELETE/PATCH
 class EditDeleteCategoryAPI(MethodView):
     @jwt_required()
     @role_required('moderador','admin')
@@ -387,15 +386,10 @@ class MyUserApi(MethodView):
     @ownership_requered(User)
     def get(self,id):
         usuario = User.query.get(id)
-        
-        current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
-        user_id = user.id
-        user_role = user.credentials.role
         return {
-            'id':user.id,
-            'name': user.name,
-            'email': user.email
+            'id':usuario.id,
+            'name': usuario.name,
+            'email': usuario.email
         },200
 
 #PATCH
