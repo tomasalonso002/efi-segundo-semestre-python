@@ -32,6 +32,36 @@ def role_required(*allowed_roles):
         return wrapper
     return decorator
 
+#validation propety
+def ownership_requered(model, resource_kw="id", owner_field="id"):
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            claims = get_jwt()
+            role = claims.get("role")
+            current_user_id = get_jwt_identity()
+            resource_id = kwargs.get(resource_kw)
+            # Buscar el recurso
+            resource = model.query.get(resource_id)
+            # Si no hay recurso
+            if not resource:
+                return {"message": "Usuario no encontrado"}, 404
+             # Si el recurso tiene el atributo is_active y está inactivo
+            if hasattr(resource, "is_active") and not resource.is_active:
+                return {"message": "Usuario no encontrado"}, 404
+            
+            #Permitir si ek rol es admin
+            if role == 'admin':
+                return fn(*args, **kwargs)
+            #verificacion de propiedadd
+            owner_id = getattr(resource, owner_field, None)
+            if int(current_user_id) != int(getattr(resource, owner_field)):
+                return{"message":"No estas autorizado"}
+            
+            return fn(*args, **kwargs)
+        return wrapper
+    return decorator
+
 #Autenticación
 #Register
 class UserRegisterAPI(MethodView):
@@ -354,33 +384,19 @@ class UsersAPI(MethodView):
 class MyUserApi(MethodView):
     @jwt_required()
     @role_required('user','admin')
+    @ownership_requered(User)
     def get(self,id):
         usuario = User.query.get(id)
-
-        if not usuario:
-            return jsonify({'message':'Usuario no encntrado'}),404
-        if usuario.is_active == False:
-            return jsonify({'message':'Usuario no encontrado'}),404
         
         current_user_id = get_jwt_identity()
         user = User.query.get(current_user_id)
         user_id = user.id
         user_role = user.credentials.role
-        
-        if user_role == 'admin':
-            return {
-                'id':user.id,
-                'name': user.name,
-                'email': user.email
-                    },200
-        if int(user_id) == int(id):
-            return {
-                'id':user.id,
-                'name': user.name,
-                'email': user.email
-                    },200
-        
-        return jsonify({'No estas autorizado a consultar un perfil no propio'}),404
+        return {
+            'id':user.id,
+            'name': user.name,
+            'email': user.email
+        },200
 
 #PATCH
 class EditUserAPI(MethodView):
