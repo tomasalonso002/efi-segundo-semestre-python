@@ -163,11 +163,15 @@ class NewPostsAPI(MethodView):
             data = PostSchema().load(request.json)
         except ValidationError as err:
             return{"Error":err.messages},400
+        
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+        user_id = user.id
         new_post = Post(
             title = data["title"],
             content = data["content"],
             created_at = datetime.now(),
-            user_id = data["user_id"],
+            user_id = user_id,
             is_active = True,
             category_id = data["category_id"]
         )
