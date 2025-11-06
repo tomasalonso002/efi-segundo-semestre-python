@@ -1,6 +1,10 @@
 
 
 #AUTENTICACION
+1) INSTANCIAR LA BASE DE DATOS
+Ejecutar el comando en la terminal:
+
+python creted_db.py
 
 1) REGISTER
 methods: post
