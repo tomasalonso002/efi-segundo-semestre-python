@@ -93,5 +93,32 @@ http://127.0.0.1:5000/post/1/comment
 methods: patch (elimianar)
 http://127.0.0.1:5000/post/comment/1
 
+Pruebas de Error:
+
+Con el usuario:
+http://127.0.0.1:5000/login
+
+body:
+{
+"email":"martin@gmail.com",
+"password":"martin123"
+}
+
+En la ruta:
+http://127.0.0.1:5000/categories
+methods: post
+body:
+{
+  "type_category":"Automovilismo"
+}
+Return esperado: "Error": "Rol no autorizado"
+Con el usuario
+{  
+"email":"admin@gmail.com",
+"password":"admin123"
+}
+En la misma ruta cambiando el token
+Return Esperado: "message": "Categoria creada con exito"
+
 
 

@@ -12,7 +12,7 @@ from flask_cors import CORS
 
 from schemas import CategorySchema, UserSchema, UserCredentialsSchema, PostSchema, CommentSchema, RegisterSchema, LoginSchema
 
-from views import *
+from views import UserRegisterAPI, UserLoginAPI, ListMyPostsAPI,ListPostActiveApi,ListOnePostAPI, NewPostsAPI, DeletePostAPI, EditPostAPI, ListCommentsOnePostAPI, NewCommentOnePostAPI, DeletePostCommentAPI, CategoryAPI, EditDeleteCategoryAPI,UsersAPI, MyUserApi, EditUserAPI, DeleteUserAPI, StatsAPI
 
 app = Flask(__name__)
 
@@ -41,8 +41,14 @@ app.add_url_rule(
 
 #Post
 app.add_url_rule(
-    '/post',
-    view_func=ListPostsAPI.as_view('list_posts_api'),
+    '/my_posts',
+    view_func=ListMyPostsAPI.as_view('list_my_posts_api'),
+    methods=['GET']
+)
+
+app.add_url_rule(
+    '/posts',
+    view_func=ListPostActiveApi.as_view('list_post_active_api'),
     methods=['GET']
 )
 
@@ -93,7 +99,7 @@ app.add_url_rule(
 #Categorias
 app.add_url_rule(
     '/categories',
-    view_func=CetegoryAPI.as_view('new_category_api'),
+    view_func=CategoryAPI.as_view('new_category_api'),
     methods=['GET','POST']
 )
 

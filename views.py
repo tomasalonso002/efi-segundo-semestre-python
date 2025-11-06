@@ -103,6 +103,7 @@ class UserRegisterAPI(MethodView):
             "menssage":"Usuario creado correctamente",
             "id": new_user.id
         }),201
+
 #Login
 class UserLoginAPI(MethodView):
     def post(self):
@@ -138,19 +139,28 @@ class UserLoginAPI(MethodView):
 
 #Post
 #GET
-class ListPostsAPI(MethodView):
+class ListMyPostsAPI(MethodView):
+    @jwt_required()
     def get(self):
-        posts = Post.query.all()
+        id_user = get_jwt_identity()
+        posts = Post.query.filter(Post.is_active == 1, Post.user_id ==  id_user).all()
         if posts:
-            return UserSchema(many=True).dump(posts),200
+            return PostSchema(many=True).dump(posts),200
         else:
             return jsonify({"Error": "No hay post"}),404
-
+class ListPostActiveApi(MethodView):
+    def get(self):
+        posts = Post.query.filter(Post.is_active == 1).all()
+        if posts:
+            return PostSchema(many=True).dump(posts),200
+        else:
+            return jsonify({"Error":"No hay post"})
+        
 class ListOnePostAPI(MethodView):
     def get(self, id):
         post = Post.query.get(id)
         if post:
-            return UserSchema().dump(post),200
+            return PostSchema().dump(post),200
         else:
             return jsonify({"Error": "No se encontro ese post"}),404
 
@@ -313,7 +323,7 @@ class DeletePostCommentAPI(MethodView):
 
 #Categorias
 #GET and POST
-class CetegoryAPI(MethodView):
+class CategoryAPI(MethodView):
     def get(self):
         categories = Category.query.all()
         if categories:
