@@ -125,4 +125,45 @@ En la misma ruta cambiando el token
 Return Esperado: "message": "Categoria creada con exito"
 
 
+Listar mis post:
+
+http://127.0.0.1:5000/my_post
+method: get
+
+Si el usurio login tiene post creados y activos te los trae, sino 'Error' : 'NO hay post'
+
+Listar todos los post:
+
+http://127.0.0.1:5000/posts
+method: get
+
+Esta ruta tiene que retornar todos los activos de todos los usuarios, no requiere estar login
+
+Eliminar post:
+
+http://127.0.0.1:5000/post/<id>
+method: patch
+
+Solo podras eliminar este post si sos el duño del post o si tenes un rol de moderado o admin
+Si todo sale bien: "Post borrado"
+Si no sale bien: "No estas autorizado a borrar este post" o  "No se encontro el post"
+
+Editar post:
+
+http://127.0.0.1:5000/post/<id>
+method: put
+
+body:
+{
+  "title":"El domingo paso atenasss",
+  "content":"Le gano 1 a 0 Sarmiento la banda",
+  "user_id": 59,
+  "category_id":1
+}
+
+Solo pueden editar el post si sos el dueño del post o si tenes un rol de moderador o admin
+Si sale todo bien: "Posteo editado correctamente"
+Si todo sale mal: "No se encontro el post" o  "No estas autorizado a editar este post"
+
+
 

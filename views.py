@@ -141,6 +141,7 @@ class UserLoginAPI(MethodView):
 #GET
 class ListMyPostsAPI(MethodView):
     @jwt_required()
+    @role_required('user','moderador', 'admin')
     def get(self):
         id_user = get_jwt_identity()
         posts = Post.query.filter(Post.is_active == 1, Post.user_id ==  id_user).all()
@@ -148,6 +149,7 @@ class ListMyPostsAPI(MethodView):
             return PostSchema(many=True).dump(posts),200
         else:
             return jsonify({"Error": "No hay post"}),404
+        
 class ListPostActiveApi(MethodView):
     def get(self):
         posts = Post.query.filter(Post.is_active == 1).all()
@@ -155,6 +157,8 @@ class ListPostActiveApi(MethodView):
             return PostSchema(many=True).dump(posts),200
         else:
             return []
+        #(retorna lista vacia sino da error al hacer una logicaen el frond
+        # Pero decia "'Error' : 'NO hay post'")
         
 class ListOnePostAPI(MethodView):
     def get(self, id):
