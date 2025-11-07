@@ -154,7 +154,7 @@ class ListPostActiveApi(MethodView):
         if posts:
             return PostSchema(many=True).dump(posts),200
         else:
-            return jsonify({"Error":"No hay post"})
+            return []
         
 class ListOnePostAPI(MethodView):
     def get(self, id):
@@ -167,7 +167,7 @@ class ListOnePostAPI(MethodView):
 #POST
 class NewPostsAPI(MethodView):
     @jwt_required()
-    @role_required('user')
+    @role_required('user','moderador', 'admin')
     def post(self):
         try:
             data = PostSchema().load(request.json)
