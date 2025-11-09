@@ -266,18 +266,20 @@ class EditPostAPI(MethodView):
         posteo.category_id = data["category_id"]     
         db.session.commit()
         return jsonify({"message":"Posteo Editado correctamente"}),200
-    
+   
 #Comentarios
+
 #GET
 class ListCommentsOnePostAPI(MethodView):
     def get(self, id):
-        comentarios = Comment.query.filter_by(post_id=id).all()
+        comentarios = Comment.query.filter(Comment.post_id == id, Comment.is_active ==  1).all()
         if comentarios:
             return CommentSchema(many=True).dump(comentarios),200
         else:
-            return jsonify({"Error":"No hay comentarios en este post"}),404
+            return []
 
 #POST
+
 class NewCommentOnePostAPI(MethodView):
     @jwt_required()
     @role_required('user','admin','moderador')
@@ -287,18 +289,25 @@ class NewCommentOnePostAPI(MethodView):
             data = CommentSchema().load(request.json)
         except ValidationError as err:
             return {"Error": err.messages}, 404
+        
+        current_user_id = get_jwt_identity()
+
+        
         newComment = Comment(
             text_comment = data["text_comment"],
             created_at = datetime.now(),
             is_active = True,
-            user_id = data["user_id"],
+            user_id = current_user_id,
             post_id = id
         )
+        
         db.session.add(newComment)
         db.session.commit()
         return jsonify({
             "message":"Comentario creado correctamente"
         })
+
+
 
 #DELETE/PATCH
 class DeletePostCommentAPI(MethodView):
@@ -333,7 +342,7 @@ class CategoryAPI(MethodView):
         if categories:
             return CategorySchema(many=True).dump(categories),200
         else:
-            return jsonify({"Error":"No hay caregorias"})    
+            return []   
     
     @jwt_required()
     @role_required('moderador','admin')
