@@ -203,10 +203,8 @@ class DeletePostAPI(MethodView):
     def patch(self,id):
         posteo = Post.query.get(id)
         if not posteo:
-            print('no encontrado')
             return jsonify({"message":"No se encontro el post"})
         if posteo.is_active == False:
-            print('es falso')
             return jsonify({"message":"No se encontro el post"})
         
         current_user_id = get_jwt_identity()
@@ -338,7 +336,7 @@ class DeletePostCommentAPI(MethodView):
 #GET and POST
 class CategoryAPI(MethodView):
     def get(self):
-        categories = Category.query.all()
+        categories = Category.query.filter(Category.is_active ==  1).all()
         if categories:
             return CategorySchema(many=True).dump(categories),200
         else:
